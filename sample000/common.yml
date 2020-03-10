@@ -1,13 +1,17 @@
 Outputs:
-  SampleBucket:
+  SampleBucketArn:
     Export:
       Name: sample-bucket-arn
     Value: !GetAtt 'SampleBucket.Arn'
-  SampleCodeBuildServiceRole:
+  SampleBucketName:
+    Export:
+      Name: sample-bucket-name
+    Value: !Ref 'SampleBucket'
+  SampleCodeBuildServiceRoleArn:
     Export:
       Name: sample-code-build-service-role-arn
     Value: !GetAtt 'SampleCodeBuildServiceRole.Arn'
-  SampleLambdaServiceRole:
+  SampleLambdaServiceRoleArn:
     Export:
       Name: sample-lambda-service-role-arn
     Value: !GetAtt 'SampleLambdaServiceRole.Arn'
