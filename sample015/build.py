@@ -1,6 +1,6 @@
 from troposphere import Template, Ref, ImportValue, Parameter
 from troposphere.codebuild import Project, Artifacts, Source, Environment, EnvironmentVariable, ProjectTriggers, \
-    SourceAuth
+    SourceAuth, WebhookFilter
 
 from sample000.export import ExportResourceEnum
 
@@ -46,6 +46,14 @@ def create_build():
             ),
             Triggers=ProjectTriggers(
                 Webhook=True,
+                FilterGroups=[
+                    [
+                        WebhookFilter(
+                            Pattern='PULL_REQUEST_CREATED, PULL_REQUEST_UPDATED',
+                            Type='EVENT'
+                        )
+                    ]
+                ]
             ),
             ServiceRole=ImportValue(ExportResourceEnum.CODE_BUILD_SERVICE_ROLE_ARN.value)
         )

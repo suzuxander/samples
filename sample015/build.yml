@@ -23,5 +23,8 @@ Resources:
         ReportBuildStatus: 'true'
         Type: GITHUB
       Triggers:
+        FilterGroups:
+          - - Pattern: PULL_REQUEST_CREATED, PULL_REQUEST_UPDATED
+              Type: EVENT
         Webhook: 'true'
     Type: AWS::CodeBuild::Project
