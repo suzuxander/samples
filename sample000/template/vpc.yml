@@ -1,0 +1,112 @@
+Parameters:
+  DmzSubnetCidr:
+    Default: 10.0.3.0/24
+    Type: String
+  PrivateSubnetCidr:
+    Default: 10.0.2.0/24
+    Type: String
+  PublicSubnetCidr:
+    Default: 10.0.1.0/24
+    Type: String
+  VpcCidr:
+    Default: 10.0.0.0/16
+    Type: String
+Resources:
+  SampleAttachment:
+    Properties:
+      InternetGatewayId: !Ref 'SampleIgw'
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::VPCGatewayAttachment
+  SampleDmzRoteTable:
+    Properties:
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::RouteTable
+  SampleDmzRoteTableAssociation:
+    Properties:
+      RouteTableId: !Ref 'SampleDmzRoteTable'
+      SubnetId: !Ref 'SampleDmzSubnet'
+    Type: AWS::EC2::SubnetRouteTableAssociation
+  SampleDmzRoute:
+    Properties:
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref 'SampleNatGateway'
+      RouteTableId: !Ref 'SampleDmzRoteTable'
+    Type: AWS::EC2::Route
+  SampleDmzSubnet:
+    Properties:
+      CidrBlock: !Ref 'DmzSubnetCidr'
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::Subnet
+  SampleEip:
+    Type: AWS::EC2::EIP
+  SampleIgw:
+    Type: AWS::EC2::InternetGateway
+  SampleNatGateway:
+    Properties:
+      AllocationId: !GetAtt 'SampleEip.AllocationId'
+      SubnetId: !Ref 'SamplePublicSubnetB'
+    Type: AWS::EC2::NatGateway
+  SamplePrivateRoteTable:
+    Properties:
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::RouteTable
+  SamplePrivateRoteTableAssociationA:
+    Properties:
+      RouteTableId: !Ref 'SamplePrivateRoteTable'
+      SubnetId: !Ref 'SamplePrivateSubnetA'
+    Type: AWS::EC2::SubnetRouteTableAssociation
+  SamplePrivateRoteTableAssociationB:
+    Properties:
+      RouteTableId: !Ref 'SamplePrivateRoteTable'
+      SubnetId: !Ref 'SamplePrivateSubnetB'
+    Type: AWS::EC2::SubnetRouteTableAssociation
+  SamplePrivateSubnetA:
+    Properties:
+      AvailabilityZone: !Sub '${AWS::Region}a'
+      CidrBlock: !Ref 'PrivateSubnetCidr'
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::Subnet
+  SamplePrivateSubnetB:
+    Properties:
+      AvailabilityZone: !Sub '${AWS::Region}b'
+      CidrBlock: !Ref 'PrivateSubnetCidr'
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::Subnet
+  SamplePublicRoteTable:
+    Properties:
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::RouteTable
+  SamplePublicRoteTableAssociationA:
+    Properties:
+      RouteTableId: !Ref 'SamplePublicRoteTable'
+      SubnetId: !Ref 'SamplePublicSubnetA'
+    Type: AWS::EC2::SubnetRouteTableAssociation
+  SamplePublicRoteTableAssociationB:
+    Properties:
+      RouteTableId: !Ref 'SamplePublicRoteTable'
+      SubnetId: !Ref 'SamplePublicSubnetB'
+    Type: AWS::EC2::SubnetRouteTableAssociation
+  SamplePublicRoute:
+    Properties:
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref 'SampleIgw'
+      RouteTableId: !Ref 'SamplePublicRoteTable'
+    Type: AWS::EC2::Route
+  SamplePublicSubnetA:
+    Properties:
+      AvailabilityZone: !Sub '${AWS::Region}a'
+      CidrBlock: !Ref 'PublicSubnetCidr'
+      MapPublicIpOnLaunch: 'true'
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::Subnet
+  SamplePublicSubnetB:
+    Properties:
+      AvailabilityZone: !Sub '${AWS::Region}b'
+      CidrBlock: !Ref 'PublicSubnetCidr'
+      MapPublicIpOnLaunch: 'true'
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::Subnet
+  SampleVpc:
+    Properties:
+      CidrBlock: !Ref 'VpcCidr'
+    Type: AWS::EC2::VPC

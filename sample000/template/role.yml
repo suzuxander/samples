@@ -1,12 +1,4 @@
 Outputs:
-  SampleBucketArn:
-    Export:
-      Name: sample-bucket-arn
-    Value: !GetAtt 'SampleBucket.Arn'
-  SampleBucketName:
-    Export:
-      Name: sample-bucket-name
-    Value: !Ref 'SampleBucket'
   SampleCodeBuildServiceRoleArn:
     Export:
       Name: sample-code-build-service-role-arn
@@ -16,10 +8,6 @@ Outputs:
       Name: sample-lambda-service-role-arn
     Value: !GetAtt 'SampleLambdaServiceRole.Arn'
 Resources:
-  SampleBucket:
-    Properties:
-      BucketName: !Sub 'sample-bucket-${AWS::AccountId}'
-    Type: AWS::S3::Bucket
   SampleCodeBuildServiceRole:
     Properties:
       AssumeRolePolicyDocument:

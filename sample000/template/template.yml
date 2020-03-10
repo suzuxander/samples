@@ -1,0 +1,13 @@
+Resources:
+  Bucket:
+    Properties:
+      TemplateURL: ./bucket.yml
+    Type: AWS::CloudFormation::Stack
+  Role:
+    Properties:
+      TemplateURL: ./role.yml
+    Type: AWS::CloudFormation::Stack
+  Vpc:
+    Properties:
+      TemplateURL: ./vpc.yml
+    Type: AWS::CloudFormation::Stack

@@ -1,0 +1,14 @@
+Outputs:
+  SampleBucketArn:
+    Export:
+      Name: sample-bucket-arn
+    Value: !GetAtt 'SampleBucket.Arn'
+  SampleBucketName:
+    Export:
+      Name: sample-bucket-name
+    Value: !Ref 'SampleBucket'
+Resources:
+  SampleBucket:
+    Properties:
+      BucketName: !Sub 'sample-bucket-${AWS::AccountId}'
+    Type: AWS::S3::Bucket
