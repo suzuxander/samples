@@ -1,5 +1,6 @@
 .idea/
 deploy.sh
+*.packaged.yml
 *.pem
 
 # Byte-compiled / optimized / DLL files

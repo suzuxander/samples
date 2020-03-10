@@ -1,3 +1,5 @@
+import copy
+
 from troposphere import Parameter, Template, Ref, GetAtt, Sub
 from troposphere.ec2 import VPC, InternetGateway, VPCGatewayAttachment, Route, Subnet, RouteTable, \
     SubnetRouteTableAssociation, NatGateway, EIP
@@ -23,19 +25,28 @@ def create_vpc_template() -> Template:
 
     public_subnet = __create_public_subnet(template, vpc)
     __create_private_subnet(template, vpc)
-    __create_dmz_subnet(template, vpc, public_subnet)
+    # __create_dmz_subnet(template, vpc, public_subnet)
 
     return template
 
 
+__CIDRS = [
+    '10.0.0.0/24',
+    '10.0.1.0/24',
+    '10.0.2.0/24',
+    '10.0.3.0/24',
+    '10.0.4.0/24',
+    '10.0.5.0/24',
+    '10.0.6.0/24',
+]
+
+
+def __get_subnet_cidr() -> str:
+    for cidr in __CIDRS:
+        return __CIDRS.pop(0)
+
+
 def __create_public_subnet(template: Template, vpc) -> Subnet:
-    public_subnet_cidr = template.add_parameter(
-        parameter=Parameter(
-            title='PublicSubnetCidr',
-            Type='String',
-            Default='10.0.1.0/24'
-        )
-    )
 
     igw = template.add_resource(
         resource=InternetGateway(
@@ -59,6 +70,14 @@ def __create_public_subnet(template: Template, vpc) -> Subnet:
     )
 
     for suffix in ['A', 'B']:
+        public_subnet_cidr = template.add_parameter(
+            parameter=Parameter(
+                title='PublicSubnetCidr' + suffix,
+                Type='String',
+                Default=__get_subnet_cidr()
+            )
+        )
+
         public_subnet = template.add_resource(
             resource=Subnet(
                 title='SamplePublicSubnet' + suffix,
@@ -90,13 +109,6 @@ def __create_public_subnet(template: Template, vpc) -> Subnet:
 
 
 def __create_private_subnet(template: Template, vpc):
-    private_subnet_cidr = template.add_parameter(
-        parameter=Parameter(
-            title='PrivateSubnetCidr',
-            Type='String',
-            Default='10.0.2.0/24'
-        )
-    )
 
     private_route_table = template.add_resource(
         resource=RouteTable(
@@ -106,6 +118,14 @@ def __create_private_subnet(template: Template, vpc):
     )
 
     for suffix in ['A', 'B']:
+        private_subnet_cidr = template.add_parameter(
+            parameter=Parameter(
+                title='PrivateSubnetCidr' + suffix,
+                Type='String',
+                Default=__get_subnet_cidr()
+            )
+        )
+
         private_subnet = template.add_resource(
             resource=Subnet(
                 title='SamplePrivateSubnet' + suffix,
@@ -129,7 +149,7 @@ def __create_dmz_subnet(template: Template, vpc, public_subnet):
         parameter=Parameter(
             title='DmzSubnetCidr',
             Type='String',
-            Default='10.0.3.0/24'
+            Default=__get_subnet_cidr()
         )
     )
 

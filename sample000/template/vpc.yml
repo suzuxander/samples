@@ -1,11 +1,14 @@
 Parameters:
-  DmzSubnetCidr:
-    Default: 10.0.3.0/24
-    Type: String
-  PrivateSubnetCidr:
+  PrivateSubnetCidrA:
     Default: 10.0.2.0/24
     Type: String
-  PublicSubnetCidr:
+  PrivateSubnetCidrB:
+    Default: 10.0.3.0/24
+    Type: String
+  PublicSubnetCidrA:
+    Default: 10.0.0.0/24
+    Type: String
+  PublicSubnetCidrB:
     Default: 10.0.1.0/24
     Type: String
   VpcCidr:
@@ -17,35 +20,8 @@ Resources:
       InternetGatewayId: !Ref 'SampleIgw'
       VpcId: !Ref 'SampleVpc'
     Type: AWS::EC2::VPCGatewayAttachment
-  SampleDmzRoteTable:
-    Properties:
-      VpcId: !Ref 'SampleVpc'
-    Type: AWS::EC2::RouteTable
-  SampleDmzRoteTableAssociation:
-    Properties:
-      RouteTableId: !Ref 'SampleDmzRoteTable'
-      SubnetId: !Ref 'SampleDmzSubnet'
-    Type: AWS::EC2::SubnetRouteTableAssociation
-  SampleDmzRoute:
-    Properties:
-      DestinationCidrBlock: '0.0.0.0/0'
-      NatGatewayId: !Ref 'SampleNatGateway'
-      RouteTableId: !Ref 'SampleDmzRoteTable'
-    Type: AWS::EC2::Route
-  SampleDmzSubnet:
-    Properties:
-      CidrBlock: !Ref 'DmzSubnetCidr'
-      VpcId: !Ref 'SampleVpc'
-    Type: AWS::EC2::Subnet
-  SampleEip:
-    Type: AWS::EC2::EIP
   SampleIgw:
     Type: AWS::EC2::InternetGateway
-  SampleNatGateway:
-    Properties:
-      AllocationId: !GetAtt 'SampleEip.AllocationId'
-      SubnetId: !Ref 'SamplePublicSubnetB'
-    Type: AWS::EC2::NatGateway
   SamplePrivateRoteTable:
     Properties:
       VpcId: !Ref 'SampleVpc'
@@ -63,13 +39,13 @@ Resources:
   SamplePrivateSubnetA:
     Properties:
       AvailabilityZone: !Sub '${AWS::Region}a'
-      CidrBlock: !Ref 'PrivateSubnetCidr'
+      CidrBlock: !Ref 'PrivateSubnetCidrA'
       VpcId: !Ref 'SampleVpc'
     Type: AWS::EC2::Subnet
   SamplePrivateSubnetB:
     Properties:
       AvailabilityZone: !Sub '${AWS::Region}b'
-      CidrBlock: !Ref 'PrivateSubnetCidr'
+      CidrBlock: !Ref 'PrivateSubnetCidrB'
       VpcId: !Ref 'SampleVpc'
     Type: AWS::EC2::Subnet
   SamplePublicRoteTable:
@@ -95,14 +71,14 @@ Resources:
   SamplePublicSubnetA:
     Properties:
       AvailabilityZone: !Sub '${AWS::Region}a'
-      CidrBlock: !Ref 'PublicSubnetCidr'
+      CidrBlock: !Ref 'PublicSubnetCidrA'
       MapPublicIpOnLaunch: 'true'
       VpcId: !Ref 'SampleVpc'
     Type: AWS::EC2::Subnet
   SamplePublicSubnetB:
     Properties:
       AvailabilityZone: !Sub '${AWS::Region}b'
-      CidrBlock: !Ref 'PublicSubnetCidr'
+      CidrBlock: !Ref 'PublicSubnetCidrB'
       MapPublicIpOnLaunch: 'true'
       VpcId: !Ref 'SampleVpc'
     Type: AWS::EC2::Subnet
