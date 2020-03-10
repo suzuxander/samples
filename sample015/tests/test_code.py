@@ -1,2 +1,5 @@
+from sample015.scripts.code import sample
+
+
 def test_buid():
-    pass
+    assert sample() == True
