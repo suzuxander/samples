@@ -2,29 +2,25 @@ Parameters:
   BuildSpecPath:
     Default: buildspec.yml
     Type: String
-  GitHubToken:
-    Type: String
   GitHubUrl:
     Type: String
 Resources:
   SampleBuildProject:
     Properties:
       Artifacts:
-        Location: !ImportValue 'sample-bucket-name'
-        Name: sample
-        Type: S3
+        Type: NO_ARTIFACTS
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        EnvironmentVariables:
-          - Name: S3_BUCKET
-            Value: !ImportValue 'sample-bucket-name'
         Image: aws/codebuild/amazonlinux2-x86_64-standard:1.0
         Type: LINUX_CONTAINER
       Name: sample-codepipeline-project
       ServiceRole: !ImportValue 'sample-code-build-service-role-arn'
       Source:
+        Auth:
+          Type: OAUTH
         BuildSpec: !Ref 'BuildSpecPath'
         Location: !Ref 'GitHubUrl'
+        ReportBuildStatus: 'true'
         Type: GITHUB
       Triggers:
         Webhook: 'true'

@@ -16,13 +16,6 @@ def create_build():
         )
     )
 
-    github_token = template.add_parameter(
-        parameter=Parameter(
-            title='GitHubToken',
-            Type='String'
-        )
-    )
-
     github_url = template.add_parameter(
         parameter=Parameter(
             title='GitHubUrl',
@@ -50,11 +43,6 @@ def create_build():
                 ComputeType='BUILD_GENERAL1_SMALL',
                 Image='aws/codebuild/amazonlinux2-x86_64-standard:1.0',
                 Type='LINUX_CONTAINER',
-                EnvironmentVariables=[
-                    EnvironmentVariable(
-                        Name='S3_BUCKET', Value=ImportValue(ExportResourceEnum.BUCKET_NAME.value)
-                    )
-                ]
             ),
             Triggers=ProjectTriggers(
                 Webhook=True,
