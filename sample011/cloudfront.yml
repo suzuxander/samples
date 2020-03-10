@@ -1,0 +1,59 @@
+Parameters:
+  Bucket:
+    Type: String
+  OriginAccessIdentity:
+    Type: String
+Resources:
+  SampleDistribution:
+    Properties:
+      DistributionConfig:
+        DefaultCacheBehavior:
+          ForwardedValues:
+            QueryString: 'true'
+          LambdaFunctionAssociations:
+            - EventType: viewer-request
+              LambdaFunctionARN: !Join
+                - ':'
+                - - !GetAtt 'SampleLambdaFunction.Arn'
+                  - '1'
+          TargetOriginId: !Sub 'S3-${Bucket}'
+          ViewerProtocolPolicy: redirect-to-https
+        Enabled: 'true'
+        Origins:
+          - DomainName: !Sub '${Bucket}.s3.amazonaws.com'
+            Id: !Sub 'S3-${Bucket}'
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${OriginAccessIdentity}'
+    Type: AWS::CloudFront::Distribution
+  SampleLambdaFunction:
+    Properties:
+      AutoPublishAlias: sample
+      CodeUri: .
+      FunctionName: sample-lambda-edge-function-1
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt 'SampleLambdaServiceRole.Arn'
+      Runtime: python3.7
+    Type: AWS::Serverless::Function
+  SampleLambdaServiceRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - edgelambda.amazonaws.com
+      Path: /
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action: lambda:*
+                Effect: Allow
+                Resource: '*'
+            Version: '2012-10-17'
+          PolicyName: sample-policy
+      RoleName: sample-lambda-edge-service-role
+    Type: AWS::IAM::Role
+Transform: AWS::Serverless-2016-10-31

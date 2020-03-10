@@ -1,0 +1,40 @@
+Parameters:
+  SubnetCidr:
+    Default: 192.168.1.0/24
+    Type: String
+  VpcCidr:
+    Default: 192.168.0.0/16
+    Type: String
+Resources:
+  SampleAttachment:
+    Properties:
+      InternetGatewayId: !Ref 'SampleIgw'
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::VPCGatewayAttachment
+  SampleIgw:
+    Type: AWS::EC2::InternetGateway
+  SampleRoteTable:
+    Properties:
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::RouteTable
+  SampleRoteTableAssociation:
+    Properties:
+      RouteTableId: !Ref 'SampleRoteTable'
+      SubnetId: !Ref 'SampleSubnet'
+    Type: AWS::EC2::SubnetRouteTableAssociation
+  SampleRoute:
+    Properties:
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref 'SampleIgw'
+      RouteTableId: !Ref 'SampleRoteTable'
+    Type: AWS::EC2::Route
+  SampleSubnet:
+    Properties:
+      CidrBlock: !Ref 'SubnetCidr'
+      MapPublicIpOnLaunch: 'true'
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::Subnet
+  SampleVpc:
+    Properties:
+      CidrBlock: !Ref 'VpcCidr'
+    Type: AWS::EC2::VPC

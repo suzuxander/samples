@@ -1,0 +1,54 @@
+Parameters:
+  DBMasterUserName:
+    Type: String
+  DBMasterUserPassword:
+    Type: String
+  EngineVersion:
+    Default: 5.7.26
+    Type: String
+  InstanceClass:
+    Default: db.t2.micro
+    Type: String
+  StorageSize:
+    Default: '20'
+    Type: String
+  SubnetA:
+    Type: String
+  SubnetB:
+    Type: String
+  Vpc:
+    Type: String
+Resources:
+  SampleDBInstance:
+    Properties:
+      AllocatedStorage: !Ref 'StorageSize'
+      DBInstanceClass: !Ref 'InstanceClass'
+      DBInstanceIdentifier: sample-rds
+      DBName: sample_rds
+      DBSubnetGroupName: !Ref 'SampleDBSubnetGroup'
+      Engine: mysql
+      EngineVersion: !Ref 'EngineVersion'
+      MasterUserPassword: !Ref 'DBMasterUserPassword'
+      MasterUsername: !Ref 'DBMasterUserName'
+      PubliclyAccessible: 'true'
+      VPCSecurityGroups:
+        - !GetAtt 'SampleSecurityGroup.GroupId'
+    Type: AWS::RDS::DBInstance
+  SampleDBSubnetGroup:
+    Properties:
+      DBSubnetGroupDescription: sample-rds
+      DBSubnetGroupName: sample-rds
+      SubnetIds:
+        - !Ref 'SubnetA'
+        - !Ref 'SubnetB'
+    Type: AWS::RDS::DBSubnetGroup
+  SampleSecurityGroup:
+    Properties:
+      GroupDescription: sample-rds
+      SecurityGroupIngress:
+        - CidrIp: '0.0.0.0/0'
+          FromPort: 3306
+          IpProtocol: tcp
+          ToPort: 3306
+      VpcId: !Ref 'Vpc'
+    Type: AWS::EC2::SecurityGroup

@@ -1,0 +1,39 @@
+Parameters:
+  KeyName:
+    Type: String
+  Vpc:
+    Type: String
+Resources:
+  SampleEc2Instance:
+    Properties:
+      ImageId: ami-0e2ff28bfb72a4e45
+      InstanceType: t2.micro
+      KeyName: !Ref 'KeyName'
+      SecurityGroupIds:
+        - !Ref 'SampleSecurityGroup'
+      SubnetId: !Ref 'SampleSubnetA'
+    Type: AWS::EC2::Instance
+  SampleSecurityGroup:
+    Properties:
+      GroupDescription: sample
+      SecurityGroupIngress:
+        - CidrIp: '0.0.0.0/0'
+          FromPort: 80
+          IpProtocol: tcp
+          ToPort: 80
+      VpcId: !Ref 'Vpc'
+    Type: AWS::EC2::SecurityGroup
+  SampleSubnetA:
+    Properties:
+      AvailabilityZone: us-east-1a
+      CidrBlock: 192.168.10.0/24
+      MapPublicIpOnLaunch: 'true'
+      VpcId: !Ref 'Vpc'
+    Type: AWS::EC2::Subnet
+  SampleSubnetB:
+    Properties:
+      AvailabilityZone: us-east-1b
+      CidrBlock: 192.168.11.0/24
+      MapPublicIpOnLaunch: 'true'
+      VpcId: !Ref 'Vpc'
+    Type: AWS::EC2::Subnet

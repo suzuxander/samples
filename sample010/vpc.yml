@@ -1,0 +1,57 @@
+Parameters:
+  SubnetCidr1:
+    Default: 192.168.1.0/24
+    Type: String
+  SubnetCidr2:
+    Default: 192.168.2.0/24
+    Type: String
+  VpcCidr:
+    Default: 192.168.0.0/16
+    Type: String
+Resources:
+  SampleAttachment:
+    Properties:
+      InternetGatewayId: !Ref 'SampleIgw'
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::VPCGatewayAttachment
+  SampleIgw:
+    Type: AWS::EC2::InternetGateway
+  SampleRoteTable:
+    Properties:
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::RouteTable
+  SampleRoteTableAssociationA:
+    Properties:
+      RouteTableId: !Ref 'SampleRoteTable'
+      SubnetId: !Ref 'SampleSubnetA'
+    Type: AWS::EC2::SubnetRouteTableAssociation
+  SampleRoteTableAssociationB:
+    Properties:
+      RouteTableId: !Ref 'SampleRoteTable'
+      SubnetId: !Ref 'SampleSubnetB'
+    Type: AWS::EC2::SubnetRouteTableAssociation
+  SampleRoute:
+    Properties:
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref 'SampleIgw'
+      RouteTableId: !Ref 'SampleRoteTable'
+    Type: AWS::EC2::Route
+  SampleSubnetA:
+    Properties:
+      AvailabilityZone: us-east-1a
+      CidrBlock: !Ref 'SubnetCidr1'
+      MapPublicIpOnLaunch: 'true'
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::Subnet
+  SampleSubnetB:
+    Properties:
+      AvailabilityZone: us-east-1b
+      CidrBlock: !Ref 'SubnetCidr2'
+      MapPublicIpOnLaunch: 'true'
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::Subnet
+  SampleVpc:
+    Properties:
+      CidrBlock: !Ref 'VpcCidr'
+      EnableDnsHostnames: 'true'
+    Type: AWS::EC2::VPC

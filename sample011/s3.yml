@@ -1,0 +1,24 @@
+Resources:
+  SampleBucket:
+    Properties:
+      BucketName: !Sub 'lambda-edge-sample-bucket-${AWS::AccountId}'
+    Type: AWS::S3::Bucket
+  SampleBucketPolicy:
+    Properties:
+      Bucket: !Ref 'SampleBucket'
+      PolicyDocument:
+        Statement:
+          - Action: s3:GetObject
+            Effect: Allow
+            Principal:
+              CanonicalUser: !GetAtt 'SampleOriginAccessIdentity.S3CanonicalUserId'
+            Resource: !Join
+              - /
+              - - !GetAtt 'SampleBucket.Arn'
+                - '*'
+    Type: AWS::S3::BucketPolicy
+  SampleOriginAccessIdentity:
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: lambda-edge-sample
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity

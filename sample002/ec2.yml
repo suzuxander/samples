@@ -1,0 +1,36 @@
+Parameters:
+  AmiImage:
+    Default: ami-0e2ff28bfb72a4e45
+    Type: String
+  KeyName:
+    Type: String
+  MyIp:
+    Type: String
+  Subnet:
+    Type: String
+  Vpc:
+    Type: String
+Resources:
+  SampleEc2Instance:
+    Properties:
+      ImageId: !Ref 'AmiImage'
+      InstanceType: t2.micro
+      KeyName: !Ref 'KeyName'
+      SecurityGroupIds:
+        - !Ref 'SampleSecurityGroup'
+      SubnetId: !Ref 'Subnet'
+    Type: AWS::EC2::Instance
+  SampleSecurityGroup:
+    Properties:
+      GroupDescription: sample
+      SecurityGroupIngress:
+        - CidrIp: '0.0.0.0/0'
+          FromPort: 80
+          IpProtocol: tcp
+          ToPort: 80
+        - CidrIp: !Ref 'MyIp'
+          FromPort: 22
+          IpProtocol: tcp
+          ToPort: 22
+      VpcId: !Ref 'Vpc'
+    Type: AWS::EC2::SecurityGroup

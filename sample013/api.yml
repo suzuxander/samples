@@ -1,0 +1,40 @@
+Parameters:
+  ApiName:
+    Default: sample-api
+    Type: String
+  FunctionName:
+    Default: sample-lambda-function
+    Type: String
+  StageName:
+    Default: prod
+    Type: String
+Resources:
+  SampleApi:
+    Properties:
+      DefinitionUri: ./swagger.yml
+      Name: !Ref 'ApiName'
+      StageName: !Ref 'StageName'
+    Type: AWS::Serverless::Api
+  SampleLambdaFunction:
+    Properties:
+      AutoPublishAlias: sample
+      CodeUri: .
+      Events:
+        ApiTrigger:
+          Properties:
+            Method: get
+            Path: /sample/
+            RestApiId: !Ref 'SampleApi'
+          Type: Api
+      FunctionName: !Ref 'FunctionName'
+      Handler: lambda_function.lambda_handler
+      Role: !ImportValue 'sample-lambda-service-role-arn'
+      Runtime: python3.7
+    Type: AWS::Serverless::Function
+  SampleLambdaFunctionPermission:
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref 'SampleLambdaFunction'
+      Principal: apigateway.amazonaws.com
+    Type: AWS::Lambda::Permission
+Transform: AWS::Serverless-2016-10-31

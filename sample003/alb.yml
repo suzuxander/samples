@@ -1,0 +1,48 @@
+Parameters:
+  Ec2Instance:
+    Type: String
+  SubnetA:
+    Type: String
+  SubnetB:
+    Type: String
+  Vpc:
+    Type: String
+Resources:
+  SampleListener:
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref 'SampleTargetGroup'
+          Type: forward
+      LoadBalancerArn: !Ref 'SampleLoadBalancer'
+      Port: 80
+      Protocol: HTTP
+    Type: AWS::ElasticLoadBalancingV2::Listener
+  SampleLoadBalancer:
+    Properties:
+      Name: sample-alb
+      SecurityGroups:
+        - !Ref 'SampleSecurityGroup'
+      Subnets:
+        - !Ref 'SubnetA'
+        - !Ref 'SubnetB'
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+  SampleSecurityGroup:
+    Properties:
+      GroupDescription: sample-security-group
+      SecurityGroupIngress:
+        - CidrIp: '0.0.0.0/0'
+          FromPort: 80
+          IpProtocol: tcp
+          ToPort: 80
+      VpcId: !Ref 'Vpc'
+    Type: AWS::EC2::SecurityGroup
+  SampleTargetGroup:
+    Properties:
+      Name: sample-target-group
+      Port: 80
+      Protocol: HTTP
+      Targets:
+        - Id: !Ref 'Ec2Instance'
+          Port: 80
+      VpcId: !Ref 'Vpc'
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup

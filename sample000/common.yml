@@ -1,0 +1,62 @@
+Outputs:
+  SampleBucket:
+    Export:
+      Name: sample-bucket-arn
+    Value: !GetAtt 'SampleBucket.Arn'
+  SampleCodeBuildServiceRole:
+    Export:
+      Name: sample-code-build-service-role-arn
+    Value: !GetAtt 'SampleCodeBuildServiceRole.Arn'
+  SampleLambdaServiceRole:
+    Export:
+      Name: sample-lambda-service-role-arn
+    Value: !GetAtt 'SampleLambdaServiceRole.Arn'
+Resources:
+  SampleBucket:
+    Properties:
+      BucketName: !Sub 'sample-bucket-${AWS::AccountId}'
+    Type: AWS::S3::Bucket
+  SampleCodeBuildServiceRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+      Path: /
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - logs:*
+                  - s3:*
+                Effect: Allow
+                Resource:
+                  - '*'
+            Version: '2012-10-17'
+          PolicyName: sample-codebuild-policy
+      RoleName: sample-codebuild-service-role
+    Type: AWS::IAM::Role
+  SampleLambdaServiceRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      Path: /
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action: lambda:*
+                Effect: Allow
+                Resource: '*'
+            Version: '2012-10-17'
+          PolicyName: sample-policy
+      RoleName: sample-lambda-service-role
+    Type: AWS::IAM::Role

@@ -1,0 +1,87 @@
+Parameters:
+  DmzSubnetCidr:
+    Default: 192.168.3.0/24
+    Type: String
+  PrivateSubnetCidr:
+    Default: 192.168.2.0/24
+    Type: String
+  PublicSubnetCidr:
+    Default: 192.168.1.0/24
+    Type: String
+  VpcCidr:
+    Default: 192.168.0.0/16
+    Type: String
+Resources:
+  SampleAttachment:
+    Properties:
+      InternetGatewayId: !Ref 'SampleIgw'
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::VPCGatewayAttachment
+  SampleDmzRoteTable:
+    Properties:
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::RouteTable
+  SampleDmzRoteTableAssociation:
+    Properties:
+      RouteTableId: !Ref 'SampleDmzRoteTable'
+      SubnetId: !Ref 'SampleDmzSubnet'
+    Type: AWS::EC2::SubnetRouteTableAssociation
+  SampleDmzRoute:
+    Properties:
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref 'SampleNatGateway'
+      RouteTableId: !Ref 'SampleDmzRoteTable'
+    Type: AWS::EC2::Route
+  SampleDmzSubnet:
+    Properties:
+      CidrBlock: !Ref 'DmzSubnetCidr'
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::Subnet
+  SampleEip:
+    Type: AWS::EC2::EIP
+  SampleIgw:
+    Type: AWS::EC2::InternetGateway
+  SampleNatGateway:
+    Properties:
+      AllocationId: !GetAtt 'SampleEip.AllocationId'
+      SubnetId: !Ref 'SamplePublicSubnet'
+    Type: AWS::EC2::NatGateway
+  SamplePrivateRoteTable:
+    Properties:
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::RouteTable
+  SamplePrivateRoteTableAssociation:
+    Properties:
+      RouteTableId: !Ref 'SamplePrivateRoteTable'
+      SubnetId: !Ref 'SamplePrivateSubnet'
+    Type: AWS::EC2::SubnetRouteTableAssociation
+  SamplePrivateSubnet:
+    Properties:
+      CidrBlock: !Ref 'PrivateSubnetCidr'
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::Subnet
+  SamplePublicRoteTable:
+    Properties:
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::RouteTable
+  SamplePublicRoteTableAssociation:
+    Properties:
+      RouteTableId: !Ref 'SamplePublicRoteTable'
+      SubnetId: !Ref 'SamplePublicSubnet'
+    Type: AWS::EC2::SubnetRouteTableAssociation
+  SamplePublicRoute:
+    Properties:
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref 'SampleIgw'
+      RouteTableId: !Ref 'SamplePublicRoteTable'
+    Type: AWS::EC2::Route
+  SamplePublicSubnet:
+    Properties:
+      CidrBlock: !Ref 'PublicSubnetCidr'
+      MapPublicIpOnLaunch: 'true'
+      VpcId: !Ref 'SampleVpc'
+    Type: AWS::EC2::Subnet
+  SampleVpc:
+    Properties:
+      CidrBlock: !Ref 'VpcCidr'
+    Type: AWS::EC2::VPC

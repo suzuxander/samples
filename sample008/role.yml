@@ -1,0 +1,87 @@
+Outputs:
+  SampleCloudFormationServiceRole:
+    Export:
+      Name: sample-cloudformation-service-role-arn
+    Value: !GetAtt 'SampleCloudFormationServiceRole.Arn'
+  SampleCodeBuildServiceRole:
+    Export:
+      Name: sample-codebuild-service-role-arn
+    Value: !GetAtt 'SampleCodeBuildServiceRole.Arn'
+  SampleCodePipelineServiceRole:
+    Export:
+      Name: sample-codepipeline-service-role-arn
+    Value: !GetAtt 'SampleCodePipelineServiceRole.Arn'
+Resources:
+  SampleCloudFormationServiceRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: cloudformation.amazonaws.com
+      Path: /
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - cloudformation:*
+                  - iam:*
+                  - lambda:*
+                  - s3:*
+                Effect: Allow
+                Resource:
+                  - '*'
+            Version: '2012-10-17'
+          PolicyName: sample-cloudformation-policy
+      RoleName: sample-cloudformation-service-role
+    Type: AWS::IAM::Role
+  SampleCodeBuildServiceRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+      Path: /
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - logs:*
+                  - s3:*
+                Effect: Allow
+                Resource:
+                  - '*'
+            Version: '2012-10-17'
+          PolicyName: sample-codebuild-policy
+      RoleName: sample-codebuild-service-role
+    Type: AWS::IAM::Role
+  SampleCodePipelineServiceRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+      Path: /
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - cloudformation:*
+                  - codebuild:*
+                  - iam:*
+                  - s3:*
+                Effect: Allow
+                Resource:
+                  - '*'
+            Version: '2012-10-17'
+          PolicyName: sample-codepipeline-policy
+      RoleName: sample-codepipeline-service-role
+    Type: AWS::IAM::Role

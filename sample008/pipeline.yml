@@ -1,0 +1,105 @@
+Parameters:
+  BuildSpecPath:
+    Default: buildspec.yml
+    Type: String
+  GitHubBranch:
+    Default: master
+    Type: String
+  GitHubOwner:
+    Type: String
+  GitHubRepo:
+    Type: String
+  GitHubToken:
+    Type: String
+Resources:
+  SampleArtifactBucket:
+    Properties:
+      BucketName: !Sub 'sample-codepipeline-artifact-bucket-${AWS::AccountId}'
+    Type: AWS::S3::Bucket
+  SampleBuildProject:
+    Properties:
+      Artifacts:
+        Location: !Ref 'SampleArtifactBucket'
+        Name: sample
+        Type: S3
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        EnvironmentVariables:
+          - Name: S3_BUCKET
+            Value: !Ref 'SampleArtifactBucket'
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:1.0
+        Type: LINUX_CONTAINER
+      Name: sample-codepipeline-project
+      ServiceRole: !ImportValue 'sample-codebuild-service-role-arn'
+      Source:
+        BuildSpec: !Ref 'BuildSpecPath'
+        Location: !Sub '${SampleArtifactBucket}/sample.zip'
+        Type: S3
+    Type: AWS::CodeBuild::Project
+  SamplePipeline:
+    Properties:
+      ArtifactStore:
+        Location: !Ref 'SampleArtifactBucket'
+        Type: S3
+      RoleArn: !ImportValue 'sample-codepipeline-service-role-arn'
+      Stages:
+        - Actions:
+            - ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Provider: GitHub
+                Version: '1'
+              Configuration:
+                Branch: !Ref 'GitHubBranch'
+                OAuthToken: !Ref 'GitHubToken'
+                Owner: !Ref 'GitHubOwner'
+                Repo: !Ref 'GitHubRepo'
+              Name: App
+              OutputArtifacts:
+                - Name: MyApp
+          Name: Source
+        - Actions:
+            - ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                ProjectName: !Ref 'SampleBuildProject'
+              InputArtifacts:
+                - Name: MyApp
+              Name: Build
+              OutputArtifacts:
+                - Name: MyBuild
+              RunOrder: 1
+          Name: Build
+        - Actions:
+            - ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: '1'
+              Configuration:
+                ActionMode: CHANGE_SET_REPLACE
+                Capabilities: CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
+                ChangeSetName: pipeline-sample-function-change-set
+                RoleArn: !ImportValue 'sample-cloudformation-service-role-arn'
+                StackName: pipeline-sample-function
+                TemplatePath: MyBuild::function.yml
+              InputArtifacts:
+                - Name: MyBuild
+              Name: ChangeSetReplace
+              RunOrder: 1
+            - ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: '1'
+              Configuration:
+                ActionMode: CHANGE_SET_EXECUTE
+                ChangeSetName: pipeline-sample-function-change-set
+                StackName: pipeline-sample-function
+              Name: ChangeSetExecute
+              RunOrder: 2
+          Name: Deploy
+    Type: AWS::CodePipeline::Pipeline

@@ -1,0 +1,45 @@
+Resources:
+  SampleBucket:
+    Properties:
+      BucketName: !Sub 'sample-bucket-${AWS::AccountId}'
+    Type: AWS::S3::Bucket
+  SampleBucketPolicy:
+    Properties:
+      Bucket: !Ref 'SampleBucket'
+      PolicyDocument:
+        Statement:
+          - Action: s3:GetObject
+            Effect: Allow
+            Principal:
+              CanonicalUser: !GetAtt 'SampleOriginAccessIdentity.S3CanonicalUserId'
+            Resource: !Join
+              - /
+              - - !GetAtt 'SampleBucket.Arn'
+                - '*'
+    Type: AWS::S3::BucketPolicy
+  SampleDistribution:
+    Properties:
+      DistributionConfig:
+        CustomErrorResponses:
+          - ErrorCachingMinTTL: 30
+            ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /404.html
+        DefaultCacheBehavior:
+          ForwardedValues:
+            QueryString: 'true'
+          TargetOriginId: !Sub 'S3-${SampleBucket}'
+          ViewerProtocolPolicy: redirect-to-https
+        DefaultRootObject: index.html
+        Enabled: 'true'
+        Origins:
+          - DomainName: !Sub '${SampleBucket}.s3.amazonaws.com'
+            Id: !Sub 'S3-${SampleBucket}'
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${SampleOriginAccessIdentity}'
+    Type: AWS::CloudFront::Distribution
+  SampleOriginAccessIdentity:
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: sample
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
