@@ -11,4 +11,4 @@ phases:
 
   pre_build:
     commands:
-      - pytest
+      - python3 -m pytest
