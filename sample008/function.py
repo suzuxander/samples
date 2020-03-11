@@ -1,43 +1,13 @@
-from troposphere import Template, GetAtt
+from troposphere import Template, GetAtt, ImportValue
 from troposphere.iam import Role, Policy
 from troposphere.serverless import Function
+
+from sample000.export import ExportResourceEnum
 
 
 def create_function_template():
     template = Template()
     template.set_transform('AWS::Serverless-2016-10-31')
-
-    service_role = template.add_resource(
-        resource=Role(
-            title='SampleLambdaServiceRole',
-            RoleName='sample-lambda-service-role',
-            Path='/',
-            AssumeRolePolicyDocument={
-                "Statement": [{
-                    "Effect": "Allow",
-                    "Principal": {
-                        "Service": ['lambda.amazonaws.com']
-                    },
-                    "Action": ["sts:AssumeRole"]
-                }]
-            },
-            Policies=[
-                Policy(
-                    PolicyName="sample-policy",
-                    PolicyDocument={
-                        "Version": "2012-10-17",
-                        "Statement": [
-                            {
-                                "Action": 'lambda:*',
-                                "Resource": '*',
-                                "Effect": "Allow"
-                            }
-                        ]
-                    }
-                )
-            ]
-        )
-    )
 
     template.add_resource(
         resource=Function(
@@ -45,7 +15,8 @@ def create_function_template():
             CodeUri='.',
             FunctionName='sample-lambda-function',
             Handler='lambda_function.lambda_handler',
-            Role=GetAtt(logicalName=service_role, attrName='Arn'),
+            # Role=GetAtt(logicalName=service_role, attrName='Arn'),
+            Role=ImportValue(ExportResourceEnum.LAMBDA_SERVICE_ROLE_ARN.value),
             Runtime='python3.7',
         )
     )
