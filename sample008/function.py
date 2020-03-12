@@ -1,8 +1,7 @@
-from troposphere import Template, GetAtt, ImportValue
-from troposphere.iam import Role, Policy
+from troposphere import Template, ImportValue
 from troposphere.serverless import Function
 
-from sample000.export import ExportResourceEnum
+from sample000.resource import CommonResource
 
 
 def create_function_template():
@@ -15,8 +14,7 @@ def create_function_template():
             CodeUri='.',
             FunctionName='sample-lambda-function',
             Handler='lambda_function.lambda_handler',
-            # Role=GetAtt(logicalName=service_role, attrName='Arn'),
-            Role=ImportValue(ExportResourceEnum.LAMBDA_SERVICE_ROLE_ARN.value),
+            Role=ImportValue(CommonResource.ExportName.LAMBDA_SERVICE_ROLE_ARN.value),
             Runtime='python3.7',
         )
     )

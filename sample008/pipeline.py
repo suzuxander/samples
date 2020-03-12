@@ -3,7 +3,7 @@ from troposphere.codebuild import Project, Artifacts, Source, Environment, Envir
 from troposphere.codepipeline import Pipeline, ArtifactStore, Stages, Actions, ActionTypeId, OutputArtifacts, \
     InputArtifacts
 
-from sample000.export import ExportResourceEnum
+from sample000.resource import CommonResource
 
 
 def create_pipeline_template():
@@ -26,7 +26,7 @@ def __create_build_project(template: Template) -> Project:
         )
     )
 
-    bucket = ImportValue(ExportResourceEnum.BUCKET_NAME.value)
+    bucket = ImportValue(CommonResource.ExportName.BUCKET_NAME.value)
 
     build_project = template.add_resource(
         resource=Project(
@@ -49,7 +49,7 @@ def __create_build_project(template: Template) -> Project:
                     )
                 ]
             ),
-            ServiceRole=ImportValue(ExportResourceEnum.CODE_BUILD_SERVICE_ROLE_ARN.value)
+            ServiceRole=ImportValue(CommonResource.ExportName.CODE_BUILD_SERVICE_ROLE_ARN.value)
         )
     )
     return build_project
@@ -87,7 +87,7 @@ def __create_pipeline(template: Template, build_project: Project):
     stack_name = 'pipeline-sample-function'
     change_set_name = 'pipeline-sample-function-change-set'
 
-    bucket = ImportValue(ExportResourceEnum.BUCKET_NAME.value)
+    bucket = ImportValue(CommonResource.ExportName.BUCKET_NAME.value)
 
     template.add_resource(
         resource=Pipeline(
@@ -96,7 +96,7 @@ def __create_pipeline(template: Template, build_project: Project):
                 Type='S3',
                 Location=bucket,
             ),
-            RoleArn=ImportValue(ExportResourceEnum.CODE_PIPELINE_SERVICE_ROLE_ARN.value),
+            RoleArn=ImportValue(CommonResource.ExportName.CODE_PIPELINE_SERVICE_ROLE_ARN.value),
             Stages=[
                 Stages(
                     Name="Source",
@@ -161,7 +161,7 @@ def __create_pipeline(template: Template, build_project: Project):
                                 "Capabilities": "CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND",
                                 "ChangeSetName": change_set_name,
                                 "StackName": stack_name,
-                                "RoleArn": ImportValue(ExportResourceEnum.CLOUD_FORMATION_SERVICE_ROLE_ARN.value),
+                                "RoleArn": ImportValue(CommonResource.ExportName.CLOUD_FORMATION_SERVICE_ROLE_ARN.value),
                                 "TemplatePath": build_artifact + '::function.yml'
                             },
                             InputArtifacts=[
