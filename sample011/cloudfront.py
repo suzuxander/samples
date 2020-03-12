@@ -1,69 +1,46 @@
-from troposphere import Template, Parameter, Sub, GetAtt, Join, Ref
+from troposphere import Template, Sub, GetAtt, Join, Ref, ImportValue
 from troposphere.cloudfront import Distribution, \
-    DistributionConfig, Origin, S3OriginConfig, DefaultCacheBehavior, ForwardedValues, LambdaFunctionAssociation
-from troposphere.iam import Role, Policy
-from troposphere.serverless import Function
+    DistributionConfig, Origin, S3OriginConfig, DefaultCacheBehavior, ForwardedValues, LambdaFunctionAssociation, \
+    CloudFrontOriginAccessIdentity, CloudFrontOriginAccessIdentityConfig
+from troposphere.s3 import Bucket, BucketPolicy
+
+from sample011.function import get_export_name
 
 
 def create_cloud_front_template():
     template = Template()
     template.set_transform('AWS::Serverless-2016-10-31')
 
-    bucket = template.add_parameter(
-        parameter=Parameter(
-            title='Bucket',
-            Type='String'
+    bucket = template.add_resource(
+        resource=Bucket(
+            title='SampleOriginBucket',
+            BucketName=Sub('sample-origin-bucket-${AWS::AccountId}')
         )
     )
 
-    identity = template.add_parameter(
-        parameter=Parameter(
-            title='OriginAccessIdentity',
-            Type='String'
+    identity = template.add_resource(
+        resource=CloudFrontOriginAccessIdentity(
+            title='SampleOriginAccessIdentity',
+            CloudFrontOriginAccessIdentityConfig=CloudFrontOriginAccessIdentityConfig(
+                Comment='sample-lambda-edge'
+            )
         )
     )
 
-    service_role = template.add_resource(
-        resource=Role(
-            title='SampleLambdaServiceRole',
-            RoleName='sample-lambda-edge-service-role',
-            Path='/',
-            AssumeRolePolicyDocument={
-                "Statement": [{
-                    "Effect": "Allow",
-                    "Principal": {
-                        "Service": ['lambda.amazonaws.com', 'edgelambda.amazonaws.com']
-                    },
-                    "Action": ["sts:AssumeRole"]
-                }]
-            },
-            Policies=[
-                Policy(
-                    PolicyName="sample-policy",
-                    PolicyDocument={
-                        "Version": "2012-10-17",
-                        "Statement": [
-                            {
-                                "Action": 'lambda:*',
-                                "Resource": '*',
-                                "Effect": "Allow"
-                            }
-                        ]
+    template.add_resource(
+        resource=BucketPolicy(
+            title='SampleBucketPolicy',
+            Bucket=Ref(bucket),
+            PolicyDocument={
+                'Statement': [{
+                    'Action': 's3:GetObject',
+                    'Effect': 'Allow',
+                    'Resource': Join(delimiter='/', values=[GetAtt(bucket, 'Arn'), '*']),
+                    'Principal': {
+                        'CanonicalUser': GetAtt(logicalName=identity, attrName='S3CanonicalUserId')
                     }
-                )
-            ]
-        )
-    )
-
-    lambda_function = template.add_resource(
-        resource=Function(
-            title='SampleLambdaFunction',
-            AutoPublishAlias='sample',
-            CodeUri='.',
-            FunctionName='sample-lambda-edge-function-1',
-            Handler='lambda_function.lambda_handler',
-            Role=GetAtt(logicalName=service_role, attrName='Arn'),
-            Runtime='python3.7',
+                }]
+            }
         )
     )
 
@@ -78,11 +55,9 @@ def create_cloud_front_template():
                     LambdaFunctionAssociations=[
                         LambdaFunctionAssociation(
                             EventType='viewer-request',
-                            LambdaFunctionARN=Join(delimiter=':', values=[
-                                GetAtt(logicalName=lambda_function, attrName='Arn'),
-                                '1'
+                            LambdaFunctionARN=Sub([
+                                '${FUNCTION_ARN}:8', {'FUNCTION_ARN': ImportValue(get_export_name())}
                             ]),
-                            # LambdaFunctionARN=Sub('${' + lambda_function_arn.title + '}:1')
                         )
                     ],
                     TargetOriginId=Sub('S3-${' + bucket.title + '}'),

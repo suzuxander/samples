@@ -1,0 +1,16 @@
+Outputs:
+  SampleLambdaFunction:
+    Export:
+      Name: sample-lambda-edge-function-arn
+    Value: !GetAtt 'SampleLambdaFunction.Arn'
+Resources:
+  SampleLambdaFunction:
+    Properties:
+      AutoPublishAlias: sample
+      CodeUri: .
+      FunctionName: sample-lambda-edge-function
+      Handler: lambda_function.lambda_handler
+      Role: !ImportValue 'sample-lambda-edge-service-role-arn'
+      Runtime: python3.7
+    Type: AWS::Serverless::Function
+Transform: AWS::Serverless-2016-10-31

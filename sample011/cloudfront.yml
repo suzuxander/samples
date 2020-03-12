@@ -1,9 +1,18 @@
-Parameters:
-  Bucket:
-    Type: String
-  OriginAccessIdentity:
-    Type: String
 Resources:
+  SampleBucketPolicy:
+    Properties:
+      Bucket: !Ref 'SampleOriginBucket'
+      PolicyDocument:
+        Statement:
+          - Action: s3:GetObject
+            Effect: Allow
+            Principal:
+              CanonicalUser: !GetAtt 'SampleOriginAccessIdentity.S3CanonicalUserId'
+            Resource: !Join
+              - /
+              - - !GetAtt 'SampleOriginBucket.Arn'
+                - '*'
+    Type: AWS::S3::BucketPolicy
   SampleDistribution:
     Properties:
       DistributionConfig:
@@ -12,48 +21,25 @@ Resources:
             QueryString: 'true'
           LambdaFunctionAssociations:
             - EventType: viewer-request
-              LambdaFunctionARN: !Join
-                - ':'
-                - - !GetAtt 'SampleLambdaFunction.Arn'
-                  - '1'
-          TargetOriginId: !Sub 'S3-${Bucket}'
+              LambdaFunctionARN: !Sub
+                - ${FUNCTION_ARN}:8
+                - FUNCTION_ARN: !ImportValue 'sample-lambda-edge-function-arn'
+          TargetOriginId: !Sub 'S3-${SampleOriginBucket}'
           ViewerProtocolPolicy: redirect-to-https
         Enabled: 'true'
         Origins:
-          - DomainName: !Sub '${Bucket}.s3.amazonaws.com'
-            Id: !Sub 'S3-${Bucket}'
+          - DomainName: !Sub '${SampleOriginBucket}.s3.amazonaws.com'
+            Id: !Sub 'S3-${SampleOriginBucket}'
             S3OriginConfig:
-              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${OriginAccessIdentity}'
+              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${SampleOriginAccessIdentity}'
     Type: AWS::CloudFront::Distribution
-  SampleLambdaFunction:
+  SampleOriginAccessIdentity:
     Properties:
-      AutoPublishAlias: sample
-      CodeUri: .
-      FunctionName: sample-lambda-edge-function-1
-      Handler: lambda_function.lambda_handler
-      Role: !GetAtt 'SampleLambdaServiceRole.Arn'
-      Runtime: python3.7
-    Type: AWS::Serverless::Function
-  SampleLambdaServiceRole:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: sample-lambda-edge
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+  SampleOriginBucket:
     Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Action:
-              - sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service:
-                - lambda.amazonaws.com
-                - edgelambda.amazonaws.com
-      Path: /
-      Policies:
-        - PolicyDocument:
-            Statement:
-              - Action: lambda:*
-                Effect: Allow
-                Resource: '*'
-            Version: '2012-10-17'
-          PolicyName: sample-policy
-      RoleName: sample-lambda-edge-service-role
-    Type: AWS::IAM::Role
+      BucketName: !Sub 'sample-origin-bucket-${AWS::AccountId}'
+    Type: AWS::S3::Bucket
 Transform: AWS::Serverless-2016-10-31
