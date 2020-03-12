@@ -72,8 +72,13 @@ def __create_lambda_edge_function_service_role(template):
                         "Version": "2012-10-17",
                         "Statement": [
                             {
-                                "Action": 'lambda:*',
-                                "Resource": '*',
+                                "Action": [
+                                    'lambda:*',
+                                    'logs:*'
+                                ],
+                                "Resource": [
+                                    '*'
+                                ],
                                 "Effect": "Allow"
                             }
                         ]
