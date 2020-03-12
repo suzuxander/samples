@@ -1,3 +1,24 @@
+Outputs:
+  SamplePrivateSubnetAId:
+    Export:
+      Name: sample-private-subnet-a-id
+    Value: !Ref 'SamplePrivateSubnetA'
+  SamplePrivateSubnetBId:
+    Export:
+      Name: sample-private-subnet-b-id
+    Value: !Ref 'SamplePrivateSubnetB'
+  SamplePublicSubnetAId:
+    Export:
+      Name: sample-public-subnet-a-id
+    Value: !Ref 'SamplePublicSubnetA'
+  SamplePublicSubnetBId:
+    Export:
+      Name: sample-public-subnet-b-id
+    Value: !Ref 'SamplePublicSubnetB'
+  SampleVpcId:
+    Export:
+      Name: sample-vpc-id
+    Value: !Ref 'SampleVpc'
 Parameters:
   PrivateSubnetCidrA:
     Default: 10.0.2.0/24

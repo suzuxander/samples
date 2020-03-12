@@ -4,6 +4,8 @@ from troposphere import Parameter, Template, Ref, GetAtt, Sub
 from troposphere.ec2 import VPC, InternetGateway, VPCGatewayAttachment, Route, Subnet, RouteTable, \
     SubnetRouteTableAssociation, NatGateway, EIP
 
+from sample000.common import add_export
+
 
 def create_vpc_template() -> Template:
     template = Template()
@@ -22,6 +24,7 @@ def create_vpc_template() -> Template:
             CidrBlock=Ref(vpc_cidr)
         )
     )
+    add_export(template, vpc.title + 'Id', Ref(vpc))
 
     public_subnet = __create_public_subnet(template, vpc)
     __create_private_subnet(template, vpc)
@@ -42,8 +45,7 @@ __CIDRS = [
 
 
 def __get_subnet_cidr() -> str:
-    for cidr in __CIDRS:
-        return __CIDRS.pop(0)
+    return __CIDRS.pop(0)
 
 
 def __create_public_subnet(template: Template, vpc) -> Subnet:
@@ -87,6 +89,7 @@ def __create_public_subnet(template: Template, vpc) -> Subnet:
                 VpcId=Ref(vpc)
             )
         )
+        add_export(template, public_subnet.title + 'Id', Ref(public_subnet))
 
         template.add_resource(
             resource=SubnetRouteTableAssociation(
@@ -134,6 +137,7 @@ def __create_private_subnet(template: Template, vpc):
                 VpcId=Ref(vpc)
             )
         )
+        add_export(template, private_subnet.title + 'Id', Ref(private_subnet))
 
         template.add_resource(
             resource=SubnetRouteTableAssociation(

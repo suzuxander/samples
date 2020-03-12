@@ -11,6 +11,10 @@ Outputs:
     Export:
       Name: sample-code-pipeline-service-role-arn
     Value: !GetAtt 'SampleCodePipelineServiceRole.Arn'
+  SampleLambdaEdgeServiceRoleArn:
+    Export:
+      Name: sample-lambda-edge-service-role-arn
+    Value: !GetAtt 'SampleLambdaEdgeServiceRole.Arn'
   SampleLambdaServiceRoleArn:
     Export:
       Name: sample-lambda-service-role-arn
@@ -88,6 +92,28 @@ Resources:
             Version: '2012-10-17'
           PolicyName: sample-codepipeline-policy
       RoleName: sample-codepipeline-service-role
+    Type: AWS::IAM::Role
+  SampleLambdaEdgeServiceRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - edgelambda.amazonaws.com
+      Path: /
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action: lambda:*
+                Effect: Allow
+                Resource: '*'
+            Version: '2012-10-17'
+          PolicyName: sample-policy
+      RoleName: sample-lambda-edge-service-role
     Type: AWS::IAM::Role
   SampleLambdaServiceRole:
     Properties:
