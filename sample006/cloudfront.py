@@ -6,7 +6,7 @@ from troposphere.route53 import RecordSetType, AliasTarget
 from troposphere.s3 import Bucket, BucketPolicy
 
 
-def create_cloud_front_template():
+def create_cloudfront_template():
     template = Template()
 
     cname = template.add_parameter(
@@ -120,4 +120,4 @@ def create_cloud_front_template():
 
 
 if __name__ == '__main__':
-    create_cloud_front_template()
+    create_cloudfront_template()
