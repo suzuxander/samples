@@ -1,8 +1,8 @@
 from troposphere import Template, Ref, ImportValue, Parameter
-from troposphere.codebuild import Project, Artifacts, Source, Environment, EnvironmentVariable, ProjectTriggers, \
+from troposphere.codebuild import Project, Artifacts, Source, Environment, ProjectTriggers, \
     SourceAuth, WebhookFilter
 
-from sample000.export import ExportResourceEnum
+from sample000.resource import CommonResource
 
 
 def create_build():
@@ -55,7 +55,7 @@ def create_build():
                     ]
                 ]
             ),
-            ServiceRole=ImportValue(ExportResourceEnum.CODE_BUILD_SERVICE_ROLE_ARN.value)
+            ServiceRole=ImportValue(CommonResource.ExportName.CODE_BUILD_SERVICE_ROLE_ARN.value)
         )
     )
 
