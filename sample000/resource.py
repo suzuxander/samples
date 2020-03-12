@@ -1,7 +1,8 @@
 from enum import Enum
 
 
-class CommonResource():
+class CommonResource(object):
+
     class OutputName(Enum):
         BUCKET_NAME = 'SampleBucketName'
         BUCKET_ARN = 'SampleBucketArn'

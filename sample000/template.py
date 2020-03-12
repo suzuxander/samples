@@ -68,7 +68,7 @@ def __output_template(template: Template, template_path: str) -> None:
 
 def __import_export_resource_enum(export_dict: dict):
     text = 'from enum import Enum\n\n\n'
-    text = text + 'class CommonResource():\n'
+    text = text + 'class CommonResource(object):\n\n'
 
     text = text + '    class OutputName(Enum):\n'
     for key, _ in export_dict.items():
@@ -80,7 +80,7 @@ def __import_export_resource_enum(export_dict: dict):
     for key, value in export_dict.items():
         text = text + "        {} = '{}'\n".format(camel_to_snake(key.replace('Sample', '')).upper(), value)
 
-    with open('./export.py', mode='w') as file:
+    with open('./resource.py', mode='w') as file:
         file.write(text)
 
 
