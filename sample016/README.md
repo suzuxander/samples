@@ -21,7 +21,7 @@ AutoScalingは設定しません。
 
 ## CloudFormationテンプレートの作成コマンド例
 ```
-$ python3 -m sample016.ecs
+$ python3 -m sample016.ecs sample016
 ```
 
 ## CloudFormationのデプロイコマンド例
