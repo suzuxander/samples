@@ -1,0 +1,32 @@
+Outputs:
+  SampleFargateTargetGroup:
+    Export:
+      Name: sample-fargate-alb-target-group
+    Value: !Ref 'SampleFargateTargetGroup'
+Resources:
+  SampleFargateListener:
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref 'SampleFargateTargetGroup'
+          Type: forward
+      LoadBalancerArn: !Ref 'SampleFargateLoadBalancer'
+      Port: 80
+      Protocol: HTTP
+    Type: AWS::ElasticLoadBalancingV2::Listener
+  SampleFargateLoadBalancer:
+    Properties:
+      Name: sample-fargate-load-balancer
+      Scheme: internet-facing
+      SecurityGroups:
+        - !ImportValue 'sample-fargate-alb-security-group'
+      Subnets:
+        - !ImportValue 'sample-public-subnet-a-id'
+        - !ImportValue 'sample-public-subnet-b-id'
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+  SampleFargateTargetGroup:
+    Properties:
+      Port: 80
+      Protocol: HTTP
+      TargetType: ip
+      VpcId: !ImportValue 'sample-vpc-id'
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup

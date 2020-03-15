@@ -1,0 +1,60 @@
+Parameters:
+  Cpu:
+    Default: 256
+    Type: Number
+  DesiredCount:
+    Default: 1
+    Type: Number
+  Memory:
+    Default: 512
+    Type: Number
+Resources:
+  SampleCluster:
+    Type: AWS::ECS::Cluster
+  SampleLogGroup:
+    Properties:
+      LogGroupName: /aws/ecs/sample
+    Type: AWS::Logs::LogGroup
+  SampleService:
+    Properties:
+      Cluster: !Ref 'SampleCluster'
+      DesiredCount: !Ref 'DesiredCount'
+      LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: sample-nginx
+          ContainerPort: 80
+          TargetGroupArn: !ImportValue 'sample-fargate-alb-target-group'
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !ImportValue 'sample-fargate-task-security-group'
+          Subnets:
+            - !ImportValue 'sample-public-subnet-a-id'
+            - !ImportValue 'sample-public-subnet-b-id'
+      ServiceName: sample-fargate
+      TaskDefinition: !Ref 'SampleTaskDefinition'
+    Type: AWS::ECS::Service
+  SampleTaskDefinition:
+    Properties:
+      ContainerDefinitions:
+        - Image: nginx:latest
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref 'SampleLogGroup'
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: nginx
+          Name: sample-nginx
+          PortMappings:
+            - ContainerPort: 80
+              HostPort: 80
+              Protocol: tcp
+      Cpu: !Ref 'Cpu'
+      ExecutionRoleArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/ecsTaskExecutionRole'
+      Family: sample-fargate-task
+      Memory: !Ref 'Memory'
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+    Type: AWS::ECS::TaskDefinition
