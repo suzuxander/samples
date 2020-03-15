@@ -1,3 +1,4 @@
+import sys
 from enum import Enum
 
 from troposphere import Template, Ref, Parameter, ImportValue, Sub, Output, Export
@@ -15,7 +16,6 @@ class ExportName(Enum):
     ALB_SECURITY_GROUP = 'sample-fargate-alb-security-group'
     TASK_SECURITY_GROUP = 'sample-fargate-task-security-group'
     TARGET_GROUP = 'sample-fargate-alb-target-group'
-    # ALB_SECURITY_GROUP = 'sample-fargate-alb-security-group'
 
 
 def create_fargate_template():
@@ -75,8 +75,7 @@ def __create_security_group():
         )
     )
 
-    with open('./sg.yml', mode='w') as file:
-        file.write(template.to_yaml())
+    __output_template_file(template, 'sg.yml')
 
     return alb_security_group, task_security_group
 
@@ -130,8 +129,7 @@ def __create_load_balancer():
         )
     )
 
-    with open('./alb.yml', mode='w') as file:
-        file.write(template.to_yaml())
+    __output_template_file(template, 'alb.yml')
 
     return target_group
 
@@ -240,8 +238,15 @@ def __create_ecs():
             ]
         )
     )
+    __output_template_file(template, 'ecs.yml')
 
-    with open('./ecs.yml', mode='w') as file:
+
+def __output_template_file(template, file_name):
+    file_path = './'
+    if len(sys.argv) > 1:
+        file_path = file_path + sys.argv[1] + '/'
+    file_path = (file_path + file_name).replace('//', '/')
+    with open(file_path, mode='w') as file:
         file.write(template.to_yaml())
 
 
