@@ -30,8 +30,8 @@ Resources:
           SecurityGroups:
             - !ImportValue 'sample-fargate-task-security-group'
           Subnets:
-            - !ImportValue 'sample-private-subnet-a-id'
-            - !ImportValue 'sample-private-subnet-b-id'
+            - !ImportValue 'sample-public-subnet-a-id'
+            - !ImportValue 'sample-public-subnet-b-id'
       ServiceName: sample-fargate
       TaskDefinition: !Ref 'SampleTaskDefinition'
     Type: AWS::ECS::Service

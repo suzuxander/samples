@@ -57,18 +57,18 @@ def __create_security_group():
             title='SampleTaskSecurityGroup',
             GroupDescription='sample-fargate',
             SecurityGroupIngress=[
-                {
-                    'IpProtocol': 'tcp',
-                    'ToPort': 80,
-                    'FromPort': 80,
-                    'SourceSecurityGroupId': Ref(alb_security_group),
-                },
                 # {
                 #     'IpProtocol': 'tcp',
                 #     'ToPort': 80,
                 #     'FromPort': 80,
-                #     'CidrIp': '0.0.0.0/0'
+                #     'SourceSecurityGroupId': Ref(alb_security_group),
                 # },
+                {
+                    'IpProtocol': 'tcp',
+                    'ToPort': 80,
+                    'FromPort': 80,
+                    'CidrIp': '0.0.0.0/0'
+                },
                 # {
                 #     'SourceSecurityGroupId': Ref(alb_security_group),
                 #     'IpProtocol': -1,
@@ -236,10 +236,10 @@ def __create_ecs():
                         ImportValue(ExportName.TASK_SECURITY_GROUP.value)
                     ],
                     Subnets=[
-                        # ImportValue(CommonResource.ExportName.PUBLIC_SUBNET_A_ID.value),
-                        # ImportValue(CommonResource.ExportName.PUBLIC_SUBNET_B_ID.value),
-                        ImportValue(CommonResource.ExportName.PRIVATE_SUBNET_A_ID.value),
-                        ImportValue(CommonResource.ExportName.PRIVATE_SUBNET_B_ID.value),
+                        ImportValue(CommonResource.ExportName.PUBLIC_SUBNET_A_ID.value),
+                        ImportValue(CommonResource.ExportName.PUBLIC_SUBNET_B_ID.value),
+                        # ImportValue(CommonResource.ExportName.PRIVATE_SUBNET_A_ID.value),
+                        # ImportValue(CommonResource.ExportName.PRIVATE_SUBNET_B_ID.value),
                     ]
                 )
             ),
