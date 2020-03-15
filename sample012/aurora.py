@@ -1,31 +1,34 @@
-from troposphere import Template, Ref, Parameter, GetAtt
+from troposphere import Template, Ref, Parameter, GetAtt, ImportValue
 from troposphere.ec2 import SecurityGroup
 from troposphere.rds import DBSubnetGroup, DBInstance, DBCluster, DBClusterParameterGroup
+
+from sample000.common import output_template_file
+from sample000.resource import CommonResource
 
 
 def create_aurora_template():
     template = Template()
 
-    vpc = template.add_parameter(
-        parameter=Parameter(
-            title='Vpc',
-            Type='String'
-        )
-    )
-
-    subnet_a = template.add_parameter(
-        parameter=Parameter(
-            title='SubnetA',
-            Type='String'
-        )
-    )
-
-    subnet_b = template.add_parameter(
-        parameter=Parameter(
-            title='SubnetB',
-            Type='String'
-        )
-    )
+    # vpc = template.add_parameter(
+    #     parameter=Parameter(
+    #         title='Vpc',
+    #         Type='String'
+    #     )
+    # )
+    #
+    # subnet_a = template.add_parameter(
+    #     parameter=Parameter(
+    #         title='SubnetA',
+    #         Type='String'
+    #     )
+    # )
+    #
+    # subnet_b = template.add_parameter(
+    #     parameter=Parameter(
+    #         title='SubnetB',
+    #         Type='String'
+    #     )
+    # )
 
     master_user_name = template.add_parameter(
         parameter=Parameter(
@@ -69,7 +72,8 @@ def create_aurora_template():
                     'CidrIp': '0.0.0.0/0',
                 }
             ],
-            VpcId=Ref(vpc)
+            # VpcId=Ref(vpc)
+            VpcId=ImportValue(CommonResource.ExportName.VPC_ID.value)
         )
     )
 
@@ -78,7 +82,11 @@ def create_aurora_template():
             title='SampleDBSubnetGroup',
             DBSubnetGroupDescription='sample-aurora',
             DBSubnetGroupName='sample-aurora',
-            SubnetIds=[Ref(subnet_a), Ref(subnet_b)]
+            # SubnetIds=[Ref(subnet_a), Ref(subnet_b)]
+            SubnetIds=[
+                ImportValue(CommonResource.ExportName.PRIVATE_SUBNET_A_ID.value),
+                ImportValue(CommonResource.ExportName.PRIVATE_SUBNET_B_ID.value),
+            ]
         )
     )
 
@@ -116,8 +124,7 @@ def create_aurora_template():
             )
         )
 
-    with open('./aurora.yml', mode='w') as file:
-        file.write(template.to_yaml())
+    output_template_file(template, 'aurora.yml')
 
 
 if __name__ == '__main__':

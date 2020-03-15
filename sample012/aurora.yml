@@ -9,12 +9,6 @@ Parameters:
   InstanceClass:
     Default: db.t2.small
     Type: String
-  SubnetA:
-    Type: String
-  SubnetB:
-    Type: String
-  Vpc:
-    Type: String
 Resources:
   SampleDBCluster:
     Properties:
@@ -53,8 +47,8 @@ Resources:
       DBSubnetGroupDescription: sample-aurora
       DBSubnetGroupName: sample-aurora
       SubnetIds:
-        - !Ref 'SubnetA'
-        - !Ref 'SubnetB'
+        - !ImportValue 'sample-private-subnet-a-id'
+        - !ImportValue 'sample-private-subnet-b-id'
     Type: AWS::RDS::DBSubnetGroup
   SampleSecurityGroup:
     Properties:
@@ -64,5 +58,5 @@ Resources:
           FromPort: 3306
           IpProtocol: tcp
           ToPort: 3306
-      VpcId: !Ref 'Vpc'
+      VpcId: !ImportValue 'sample-vpc-id'
     Type: AWS::EC2::SecurityGroup
