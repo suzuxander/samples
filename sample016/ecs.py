@@ -1,4 +1,3 @@
-import sys
 from enum import Enum
 
 from troposphere import Template, Ref, Parameter, ImportValue, Sub, Output, Export
@@ -9,6 +8,7 @@ from troposphere.ecs import Cluster, Service, NetworkConfiguration, AwsvpcConfig
 from troposphere.elasticloadbalancingv2 import TargetGroup, LoadBalancer, Listener, Action
 from troposphere.logs import LogGroup
 
+from sample000.common import output_template_file
 from sample000.resource import CommonResource
 
 
@@ -75,7 +75,7 @@ def __create_security_group():
         )
     )
 
-    __output_template_file(template, 'sg.yml')
+    output_template_file(template, 'sg.yml')
 
     return alb_security_group, task_security_group
 
@@ -129,7 +129,7 @@ def __create_load_balancer():
         )
     )
 
-    __output_template_file(template, 'alb.yml')
+    output_template_file(template, 'alb.yml')
 
     return target_group
 
@@ -238,16 +238,7 @@ def __create_ecs():
             ]
         )
     )
-    __output_template_file(template, 'ecs.yml')
-
-
-def __output_template_file(template, file_name):
-    file_path = './'
-    if len(sys.argv) > 1:
-        file_path = file_path + sys.argv[1] + '/'
-    file_path = (file_path + file_name).replace('//', '/')
-    with open(file_path, mode='w') as file:
-        file.write(template.to_yaml())
+    output_template_file(template, 'ecs.yml')
 
 
 if __name__ == '__main__':
