@@ -6,8 +6,6 @@ AutoScalingは設定しません。
 
 ## 作成されるリソース
 - SecurityGroup
-  - ALB用のSecurityGroup
-  - ECS用のSecurityGroup
 
 - Application Load Balancer
   - LoadBalancer
