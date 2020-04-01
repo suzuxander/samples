@@ -1,9 +1,9 @@
 # suzuxander_sample
-[AWSとラーメン二郎とわたし](https://wpv4.suzuxander.com/)で紹介している記事で使用しているソースコードです。  
+[AWSとラーメン二郎とわたし](https://blog.suzuxander.com/)で紹介している記事で使用しているソースコードです。  
 個人で運用しているため、汚いコードやバグ、動作確認が不完全なものもありますので、その点ご了承ください。
 
 ## sample000
-[#001. 共通リソースをつくる](./sample000/README.md)
+[#000. 共通リソースをつくる](./sample000/README.md)
 
 ## sample001
 [#001. CloudFormationでVPCとパブリックなSubnetをつくる](./sample001/README.md)
