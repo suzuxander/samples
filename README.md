@@ -19,7 +19,7 @@
 - [#012. CloudFomrtionでMySQL互換のAuroraをつくる](./python/sample012/README.md)
 - [#013. CloudFomrtionでAPIGatewayとLambdaによるサーバーレスなRestAPIをつくる](./python/sample013/README.md)
 - [#015. CodeBuildでGitHubのプルリクエストが作成された時にテストを実行する](./python/sample015/README.md)
-- [# 016. CloudFomrtionでFargate起動タイプのECSをつくる](./python/sample016/README.md)
+- [#016. CloudFomrtionでFargate起動タイプのECSをつくる](./python/sample016/README.md)
 
 ## typescript
-- 
+- [#101. API Gateway + Lambda + TypeScript + webpackでサーバーレスAPIをつくる](./typescript/sample101/README.md)
