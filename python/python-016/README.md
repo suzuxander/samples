@@ -1,4 +1,4 @@
-# #016. CloudFomrtionでFargate起動タイプのECSをつくる
+# python-016. CloudFomrtionでFargate起動タイプのECSをつくる
 ## 概要
 CloudFormationを使ってFargate起動タイプのECSを作成します。  
 コンテナイメージはECRを使用せず、公式のnginxのイメージを使用します。  

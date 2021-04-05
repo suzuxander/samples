@@ -1,4 +1,4 @@
-# #012. CloudFomrtionでMySQL互換のAuroraをつくる
+# python-012. CloudFomrtionでMySQL互換のAuroraをつくる
 ## 概要
 CloudFormationを使ってMySQL5.7互換のAuroraを作成します。
 
