@@ -1,2 +1,2 @@
-# ts-001. API Gateway + Lambda + TypeScript + webpackでサーバーレスAPIをつくる
+# TS002. API Gateway + Lambda + TypeScript + webpackでサーバーレスAPIをつくる
 ## 概要
