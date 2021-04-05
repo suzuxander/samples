@@ -23,3 +23,4 @@
 ## typescript
 - [ts-001. React + Redux + TypeScript + webpackでWebアプリをつくる]()
 - [ts-002. API Gateway + Lambda + TypeScript + webpackでサーバーレスAPIをつくる](typescript/ts-002/README.md)
+- [TS003. TypeScript + AWS-SDKでCloudFormationスタック内のリソースの情報を取得する](typescript/TS003/README.md)
